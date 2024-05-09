@@ -5,7 +5,7 @@ extends Node2D
 var state = 1
 @onready var Proto = preload("res://Entities/Proto_Bloc.tscn")
 
-var colums = 1#6#12
+var colums = 12#6#12
 var rows = 8
 var blocH 
 var blocW
@@ -17,12 +17,12 @@ var number_Tiles : int = 5
 var highPos
 
 #cycle
-@export var velCycle = 3.0
+@export var velCycle = 30.0
 @export var velGrav = 0 # grave only PRIME NUMBERS of texture height
 var velocities = []
 var limitCycle = 0.5 #Play the lowest to faster 0.5
 var cycle = 0
-var creatCycle = 5 # Play the lowest to faster 20
+var creatCycle = 10 # Play the lowest to faster 20
 var multCycle = 5
 var countCycle = 0
 
