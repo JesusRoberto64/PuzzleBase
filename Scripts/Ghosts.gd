@@ -25,8 +25,6 @@ func hide_Bloc(pos: Vector2):
 
 func is_Bloc_Fallling(pos:Vector2):
 	if ghostArray[pos.y][pos.x].visible == false:
-		print("FREE SPACE")
 		return false
 	else:
-		print("ITS BLOC DUUD")
 		return true

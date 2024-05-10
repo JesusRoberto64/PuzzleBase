@@ -70,7 +70,7 @@ func _process(delta):
 	#print("FPS: ",Engine.get_frames_per_second())
 	if state != 1 : return
 	#The cycles to create blocks from upper part
-	if countCycle >= creatCycle*multCycle:
+	if countCycle >= creatCycle*multCycle or Input.is_action_just_released("trow"):
 		countCycle = 0
 		#check the upper line
 		var freeSpace = top_Free()
@@ -83,7 +83,7 @@ func _process(delta):
 	cycle += delta*velCycle
 	if cycle >= limitCycle:
 		cycle = 0
-		countCycle += 1
+		#countCycle += 1
 		if canCast:
 			canCast = false
 			create_Bloc_Color(castPos,castColor)
@@ -188,13 +188,14 @@ func selector_Act(_player, _pos: Vector2):
 	if state != 1 : return
 	var bloc = arrMatch[_pos.y/blocH][_pos.x/blocW]
 	var stack = Stacks[_player.playerID-1]
-	#To cnvert in array form and easy to manipulate
+	#To cnvert in array form and easy to manipulate to the ghost fuctions
 	var pos = Vector2(_pos.x/blocH, _pos.y/blocW)
 	if bloc != null and !bloc.IsMatched: #ABSORB and ask if has portion of block
 		# if stack is full : player can move return
 		if stack.is_Full():
 			_player.can_Move()
 			return
+		#Absobr in the middle air 
 		# player stack add_Bloc(bloc.get_Color())
 		stack.add_Bloc(bloc.get_Color())
 		bloc.queue_free()
