@@ -237,9 +237,9 @@ script = ExtResource("6_fqcno")
 position = Vector2(120, 80)
 script = ExtResource("9_3dj6c")
 
-[node name="ProtoGhost" type="Sprite2D" parent="."]
+[node name="ProtoGhost" type="Sprite2D" parent="Ghosts"]
 self_modulate = Color(1, 1, 1, 0.309804)
-position = Vector2(20, 20)
+position = Vector2(-100, -60)
 texture = ExtResource("6_bg8mk")
 centered = false
 hframes = 8

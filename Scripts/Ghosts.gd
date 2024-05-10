@@ -1,9 +1,9 @@
 extends Node2D
 
 @export var ghostArray: Array
+@onready var proto = $ProtoGhost
 
-func _draw_Blocs(array: Array, proto:Sprite2D, dimetions: Vector2):
-	ghostArray = array
+func _draw_Blocs(array: Array, dimetions: Vector2):
 	for x in range(array.size()):
 		ghostArray.append([])
 		for y in range(array[x].size()):

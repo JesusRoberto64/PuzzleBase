@@ -36,6 +36,9 @@ var castColor
 
 var Stacks
 
+#Ghost to check 
+@onready var ghosts = $Ghosts
+
 func _ready():
 	for x in range(rows): # Remember rows = is the first [r]
 		arrMatch.append([])# Remember colums = is the second[r][c]
