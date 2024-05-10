@@ -17,7 +17,7 @@ var number_Tiles : int = 5
 var highPos
 
 #cycle
-@export var velCycle = 30.0
+@export var velCycle = 10.0
 @export var velGrav = 0 # grave only PRIME NUMBERS of texture height
 var velocities = []
 var limitCycle = 0.5 #Play the lowest to faster 0.5
@@ -36,7 +36,8 @@ var castColor
 
 var Stacks
 
-#Ghost to check 
+#Ghost to check This was made to have a visual feedbak to the arrays -->Cont
+#when blocks are falling, becouse the absorb a cast mechanics have bugs
 @onready var ghosts = $Ghosts
 
 func _ready():
@@ -61,10 +62,23 @@ func _ready():
 	
 	if get_tree().get_first_node_in_group("Stack"):
 		Stacks = get_tree().get_nodes_in_group("Stack")
+	
+	#Init Ghosts
+	ghosts._draw_Blocs(arrMatch, Vector2(blocW,blocH))
 
 func _process(delta):
 	#print("FPS: ",Engine.get_frames_per_second())
 	if state != 1 : return
+	#The cycles to create blocks from upper part
+	if countCycle >= creatCycle*multCycle:
+		countCycle = 0
+		#check the upper line
+		var freeSpace = top_Free()
+		if freeSpace == null:
+			print("=========you lose======")
+			state = 0
+		else:
+			create_Bloc(Vector2(blocW*freeSpace,-blocH))
 	#Normal Cycle
 	cycle += delta*velCycle
 	if cycle >= limitCycle:
@@ -77,16 +91,7 @@ func _process(delta):
 		gravity()# 1 iteratio
 		check_Matches()# 2 iterations
 		
-	#The cycles to create blocks from upper part
-	if countCycle >= creatCycle*multCycle:
-		countCycle = 0
-		#check the upper line
-		var freeSpace = top_Free()
-		if freeSpace == null:
-			print("=========you lose======")
-			state = 0
-		else:
-			create_Bloc(Vector2(blocW*freeSpace,-blocH))
+
 
 func top_Free():
 	var spaces = []
@@ -100,8 +105,8 @@ func top_Free():
 
 func create_Bloc(_pos: Vector2):
 	var newBloc = Proto.instantiate()
-	var _debugArr = [0,4,4,4,4,0,4,3]
-	var color = randi() % blocColors #randi() % blocColors #_debugArr[debug_Blocs % debugArr.size()]
+	var _debugArr = [0,4,4,4,4,3,3,3]
+	var color = _debugArr[debug_Blocs % _debugArr.size()] #randi() % blocColors #_debugArr[debug_Blocs % debugArr.size()]
 	debug_Blocs += 1
 	newBloc.set_Color(Vector2(color,0))#get_child(0).frame_coords = Vector2(color,0)
 	newBloc.position = _pos
@@ -121,13 +126,28 @@ func gravity():
 	for i in Blocs.get_children():
 		# Convert to matchArr
 		var Pos = Vector2(i.position.x/blocW, i.position.y/blocH)# Remember invert arrMAtch[y][x]
+		#Here we ger the actual row but not at the begining nor the end of array
+		#It prevests array the typical array get an indx greater than array size. 
+		if Pos.y < (rows-1) and Pos.y > 0: 
+			#In this block just apear the next bloc and despear the previos one ->Cont
+			#this is the way we monitoring were is a bloc when is falling
+			ghosts.show_Bloc(Vector2(Pos.x, Pos.y + 1))
+			ghosts.hide_Bloc(Vector2(Pos.x, Pos.y - 1))
 		
 		if i.Solid == true: 
+			ghosts.hide_Bloc(Pos) #Got to reset the bloc when its not falling
 			if i.position.y == blocH*(rows-1):#Is Bloc on floor?
+				#This is kind of brute force to avoid ghost with no bloc
+				#To hide upper bloc when toching the ground
+				ghosts.hide_Bloc(Vector2(Pos.x, Pos.y - 1)) 
 				continue 
 			elif arrMatch[Pos.y + 1][Pos.x] != null: #Is Bloc Below?
+				#This is kind of brute force hide the bloc bleow
+				ghosts.hide_Bloc(Vector2(Pos.x, Pos.y + 1))
 				continue
 			elif  i.IsMatched:
+				#This is kind of brute force to hide the bloc bleow
+				ghosts.hide_Bloc(Vector2(Pos.x, Pos.y + 1))
 				continue
 			else:
 				i.Solid = false
@@ -168,6 +188,8 @@ func selector_Act(_player, _pos: Vector2):
 	if state != 1 : return
 	var bloc = arrMatch[_pos.y/blocH][_pos.x/blocW]
 	var stack = Stacks[_player.playerID-1]
+	#To cnvert in array form and easy to manipulate
+	var pos = Vector2(_pos.x/blocH, _pos.y/blocW)
 	if bloc != null and !bloc.IsMatched: #ABSORB and ask if has portion of block
 		# if stack is full : player can move return
 		if stack.is_Full():
@@ -176,10 +198,13 @@ func selector_Act(_player, _pos: Vector2):
 		# player stack add_Bloc(bloc.get_Color())
 		stack.add_Bloc(bloc.get_Color())
 		bloc.queue_free()
-		#bloc = null
 		arrMatch[_pos.y/blocH][_pos.x/blocW] = null
+		#Hide due to not have errors
+		ghosts.hide_Bloc(Vector2(pos.x,pos.y -1))
+		ghosts.hide_Bloc(pos)
 	else: #CAST
-		if !stack.have_Blocs():#Ask for is a portion bloc
+		#Here we check if its a block falling in the way.
+		if !stack.have_Blocs() or ghosts.is_Bloc_Fallling(pos):#Ask for is a portion bloc
 			_player.can_Move()
 			return
 		cast_Bloc(Vector2(_pos.x,_pos.y),stack.cast_Bloc())

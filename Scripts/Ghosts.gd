@@ -9,7 +9,7 @@ func _draw_Blocs(array: Array, dimetions: Vector2):
 		for y in range(array[x].size()):
 			var g = proto.duplicate()
 			g.position = Vector2(y*dimetions.y, x*dimetions.x)
-			#g.visible = false
+			g.visible = false
 			add_child(g)
 			ghostArray[x].append(g)
 			pass
@@ -17,5 +17,16 @@ func _draw_Blocs(array: Array, dimetions: Vector2):
 	pass
 
 func show_Bloc(pos: Vector2):
-	ghostArray[pos.y][pos.x + 1].visible = true
+	ghostArray[pos.y][pos.x].visible = true
 	pass
+
+func hide_Bloc(pos: Vector2):
+	ghostArray[pos.y][pos.x].visible = false
+
+func is_Bloc_Fallling(pos:Vector2):
+	if ghostArray[pos.y][pos.x].visible == false:
+		print("FREE SPACE")
+		return false
+	else:
+		print("ITS BLOC DUUD")
+		return true
