@@ -4,7 +4,7 @@ extends Area2D
 @onready var color = $Pivot/Sprite2D
 
 var IsMatched := false
-var destroyed = false
+var destroyed := false
 
 
 func get_Sizes()->Vector2:
