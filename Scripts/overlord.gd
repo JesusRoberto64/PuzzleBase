@@ -5,7 +5,7 @@ extends Node2D
 var state = 1
 @onready var Proto = preload("res://Entities/Proto_Bloc.tscn")
 
-var colums = 12#6#12
+var colums = 1#6#12
 var rows = 8
 var blocH 
 var blocW
