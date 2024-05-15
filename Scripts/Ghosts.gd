@@ -36,3 +36,9 @@ func get_Bloc(pos: Vector2):
 	if blocs[pos.y][pos.x] != null:
 		return blocs[pos.y][pos.x]
 	return null
+
+func free_Bloc(pos: Vector2):
+	ghostArray[pos.y][pos.x].visible = false
+	blocs[pos.y][pos.x].queue_free()
+	blocs[pos.y][pos.x] = null
+	pass

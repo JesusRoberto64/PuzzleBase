@@ -5,7 +5,7 @@ extends Node2D
 var state = 1
 @onready var Proto = preload("res://Entities/Proto_Bloc.tscn")
 
-var colums = 1#6#12
+var colums = 6#6#12
 var rows = 8
 var blocH 
 var blocW
@@ -216,18 +216,22 @@ func selector_Act(_player, _pos: Vector2):
 		#cast_Bloc(Vector2(_pos.x,_pos.y),stack.cast_Bloc())
 		#_player.cast() #ANIM
 	# First see if is in the air
+	
 	#Ia a space free to ABSOBR Theres a 
-	if !stack.is_Full():
-		#if ghosts.is_Bloc_Falling(Vector2(pos.x, pos.y-1)):
-			#print("ITS UP!!")
-		if ghosts.is_Bloc_Falling(pos):
+	if !stack.is_Full(): 
+		if ghosts.is_Bloc_Falling(pos) and ghosts.get_Bloc(pos):
 			var b = ghosts.get_Bloc(pos)
 			stack.add_Bloc(b.get_Color())
+			ghosts.free_Bloc(pos)
+			ghosts.hide_Bloc(pos)
 			print("Ghost heres")
 		elif bloc != null and !bloc.IsMatched:
+			stack.add_Bloc(bloc.get_Color())
+			bloc.queue_free()
+			arrMatch[_pos.y/blocH][_pos.x/blocW] = null
 			print("Bloc here")
-			
 			pass
+	#CAST===========
 	else:
 		
 		pass
