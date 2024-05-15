@@ -17,12 +17,12 @@ var number_Tiles : int = 5
 var highPos
 
 #cycle
-@export var velCycle = 10.0
+@export var velCycle = 20.0
 @export var velGrav = 0 # grave only PRIME NUMBERS of texture height
 var velocities = []
 var limitCycle = 0.5 #Play the lowest to faster 0.5
 var cycle = 0
-var creatCycle = 10 # Play the lowest to faster 20
+var createCycle = 10 # Play the lowest to faster 20
 var multCycle = 5
 var countCycle = 0
 
@@ -70,7 +70,7 @@ func _process(delta):
 	#print("FPS: ",Engine.get_frames_per_second())
 	if state != 1 : return
 	#The cycles to create blocks from upper part
-	if countCycle >= creatCycle*multCycle or Input.is_action_just_released("trow"):
+	if countCycle >= createCycle*multCycle or Input.is_action_just_released("trow"):
 		countCycle = 0
 		#check the upper line
 		var freeSpace = top_Free()
@@ -126,28 +126,33 @@ func gravity():
 	for i in Blocs.get_children():
 		# Convert to matchArr
 		var Pos = Vector2(i.position.x/blocW, i.position.y/blocH)# Remember invert arrMAtch[y][x]
-		#Here we ger the actual row but not at the begining nor the end of array
+		#Here we get the actual row but not at the begining nor the end of array
 		#It prevests array the typical array get an indx greater than array size. 
 		if Pos.y < (rows-1) and Pos.y > 0: 
 			#In this block just apear the next bloc and despear the previos one ->Cont
 			#this is the way we monitoring were is a bloc when is falling
 			ghosts.show_Bloc(Vector2(Pos.x, Pos.y + 1))
+			ghosts.blocs[Pos.y + 1][Pos.x] = i 
 			ghosts.hide_Bloc(Vector2(Pos.x, Pos.y - 1))
+			ghosts.blocs[Pos.y - 1][Pos.x] = null
 		
 		if i.Solid == true: 
 			ghosts.hide_Bloc(Pos) #Got to reset the bloc when its not falling
 			if i.position.y == blocH*(rows-1):#Is Bloc on floor?
 				#This is kind of brute force to avoid ghost with no bloc
 				#To hide upper bloc when toching the ground
-				ghosts.hide_Bloc(Vector2(Pos.x, Pos.y - 1)) 
+				ghosts.hide_Bloc(Vector2(Pos.x, Pos.y - 1))
+				ghosts.blocs[Pos.y - 1][Pos.x] = null
 				continue 
 			elif arrMatch[Pos.y + 1][Pos.x] != null: #Is Bloc Below?
 				#This is kind of brute force hide the bloc bleow
 				ghosts.hide_Bloc(Vector2(Pos.x, Pos.y + 1))
+				ghosts.blocs[Pos.y +1][Pos.x] = null
 				continue
 			elif  i.IsMatched:
 				#This is kind of brute force to hide the bloc bleow
 				ghosts.hide_Bloc(Vector2(Pos.x, Pos.y + 1))
+				ghosts.blocs[Pos.y + 1][Pos.x] = null
 				continue
 			else:
 				i.Solid = false
@@ -190,26 +195,42 @@ func selector_Act(_player, _pos: Vector2):
 	var stack = Stacks[_player.playerID-1]
 	#To cnvert in array form and easy to manipulate to the ghost fuctions
 	var pos = Vector2(_pos.x/blocH, _pos.y/blocW)
-	if bloc != null and !bloc.IsMatched: #ABSORB and ask if has portion of block
-		# if stack is full : player can move return
-		if stack.is_Full():
-			_player.can_Move()
-			return
-		#Absobr in the middle air 
-		# player stack add_Bloc(bloc.get_Color())
-		stack.add_Bloc(bloc.get_Color())
-		bloc.queue_free()
-		arrMatch[_pos.y/blocH][_pos.x/blocW] = null
-		#Hide due to not have errors
-		ghosts.hide_Bloc(Vector2(pos.x,pos.y -1))
-		ghosts.hide_Bloc(pos)
-	else: #CAST
-		#Here we check if its a block falling in the way.
-		if !stack.have_Blocs() or ghosts.is_Bloc_Fallling(pos):#Ask for is a portion bloc
-			_player.can_Move()
-			return
-		cast_Bloc(Vector2(_pos.x,_pos.y),stack.cast_Bloc())
-		_player.cast() #ANIM
+	#if bloc != null and !bloc.IsMatched: #ABSORB and ask if has portion of block
+		## if stack is full : player can move return
+		#if stack.is_Full():
+			#_player.can_Move()
+			#return
+		##Absobr in the middle air 
+		## player stack add_Bloc(bloc.get_Color())
+		#stack.add_Bloc(bloc.get_Color())
+		#bloc.queue_free()
+		#arrMatch[_pos.y/blocH][_pos.x/blocW] = null
+		##Hide due to not have errors
+		#ghosts.hide_Bloc(Vector2(pos.x,pos.y -1))
+		#ghosts.hide_Bloc(pos)
+	#else: #CAST
+		##Here we check if its a block falling in the way.
+		#if !stack.have_Blocs() or ghosts.is_Bloc_Fallling(pos):#Ask for is a portion bloc
+			#_player.can_Move()
+			#return
+		#cast_Bloc(Vector2(_pos.x,_pos.y),stack.cast_Bloc())
+		#_player.cast() #ANIM
+	# First see if is in the air
+	#Ia a space free to ABSOBR Theres a 
+	if !stack.is_Full():
+		#if ghosts.is_Bloc_Falling(Vector2(pos.x, pos.y-1)):
+			#print("ITS UP!!")
+		if ghosts.is_Bloc_Falling(pos):
+			var b = ghosts.get_Bloc(pos)
+			stack.add_Bloc(b.get_Color())
+			print("Ghost heres")
+		elif bloc != null and !bloc.IsMatched:
+			print("Bloc here")
+			
+			pass
+	else:
+		
+		pass
 	_player.can_Move()
 
 func cast_Bloc(_pos, _color):

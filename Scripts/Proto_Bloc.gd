@@ -6,7 +6,6 @@ extends Area2D
 var IsMatched := false
 var destroyed := false
 
-
 func get_Sizes()->Vector2:
 	var x = color.texture.get_width()/color.hframes
 	var y = color.texture.get_height()
