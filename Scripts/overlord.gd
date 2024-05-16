@@ -129,7 +129,7 @@ func gravity():
 		#Here we get the actual row but not at the begining nor the end of array
 		#It prevests array the typical array get an indx greater than array size. 
 		if Pos.y < (rows-1) and Pos.y > 0: 
-			#In this block just apear the next bloc and despear the previos one ->Cont
+			#In this block just apear the next bloc and despear the previos one
 			#this is the way we monitoring were is a bloc when is falling
 			ghosts.show_Bloc(Vector2(Pos.x, Pos.y + 1))
 			ghosts.blocs[Pos.y + 1][Pos.x] = i 
@@ -173,7 +173,6 @@ func gravity():
 		var currPos = i.position.y - modi # the current Multiply position in pixels No matter if its offset --> continue below
 		# thats the reason we are substractig: to get the pixel position of the lesser and closer multiply
 		var nextPos = (i.position.y - modi)+blocH # the next of the current Multiply in pixels
-		
 		if i.position.y + blocH + velGrav >= nextPos: # if is about to collide
 			if arrMatch[currArea + 1][Pos.x] == null:
 				i.position.y += velGrav
@@ -195,47 +194,34 @@ func selector_Act(_player, _pos: Vector2):
 	var stack = Stacks[_player.playerID-1]
 	#To cnvert in array form and easy to manipulate to the ghost fuctions
 	var pos = Vector2(_pos.x/blocH, _pos.y/blocW)
-	#if bloc != null and !bloc.IsMatched: #ABSORB and ask if has portion of block
-		## if stack is full : player can move return
-		#if stack.is_Full():
-			#_player.can_Move()
-			#return
-		##Absobr in the middle air 
-		## player stack add_Bloc(bloc.get_Color())
-		#stack.add_Bloc(bloc.get_Color())
-		#bloc.queue_free()
-		#arrMatch[_pos.y/blocH][_pos.x/blocW] = null
-		##Hide due to not have errors
-		#ghosts.hide_Bloc(Vector2(pos.x,pos.y -1))
-		#ghosts.hide_Bloc(pos)
-	#else: #CAST
-		##Here we check if its a block falling in the way.
-		#if !stack.have_Blocs() or ghosts.is_Bloc_Fallling(pos):#Ask for is a portion bloc
-			#_player.can_Move()
-			#return
-		#cast_Bloc(Vector2(_pos.x,_pos.y),stack.cast_Bloc())
-		#_player.cast() #ANIM
-	# First see if is in the air
-	
-	#Ia a space free to ABSOBR Theres a 
 	if !stack.is_Full(): 
+		# ABSOBR =============
 		if ghosts.is_Bloc_Falling(pos) and ghosts.get_Bloc(pos):
 			var b = ghosts.get_Bloc(pos)
 			stack.add_Bloc(b.get_Color())
 			ghosts.free_Bloc(pos)
 			ghosts.hide_Bloc(pos)
+			ghosts.hide_Bloc(Vector2(pos.x, pos.y -1))
+			if pos.y < rows-1: #Here to dont cause erros in array size.
+				ghosts.hide_Bloc(Vector2(pos.x, pos.y +1))
 			print("Ghost heres")
+			_player.can_Move()
+			return
 		elif bloc != null and !bloc.IsMatched:
 			stack.add_Bloc(bloc.get_Color())
 			bloc.queue_free()
 			arrMatch[_pos.y/blocH][_pos.x/blocW] = null
 			print("Bloc here")
-			pass
-	#CAST===========
-	else:
-		
-		pass
+			_player.can_Move()
+			return
+	# CAST ============
+	print(stack.blocs)
+	if stack.have_Blocs() and !ghosts.is_Bloc_Falling(pos):
+		print("CAST!!")
+		cast_Bloc(Vector2(_pos.x,_pos.y),stack.cast_Bloc())
+		_player.cast() #ANIM
 	_player.can_Move()
+	return
 
 func cast_Bloc(_pos, _color):
 	for i in Blocs.get_children():
