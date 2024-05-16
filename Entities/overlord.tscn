@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bhib6rb28e6w4"]
+[gd_scene load_steps=14 format=3 uid="uid://bhib6rb28e6w4"]
 
 [ext_resource type="Script" path="res://Scripts/overlord.gd" id="1_q42w7"]
 [ext_resource type="PackedScene" uid="uid://b7a5pw1p758w6" path="res://Entities/Proto_Bloc.tscn" id="2_ak1cq"]
@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://82ymbm6sihah" path="res://Assets/blocks/blocks_00.png" id="6_bg8mk"]
 [ext_resource type="Script" path="res://Scripts/Debugs/FPS.gd" id="6_fqcno"]
 [ext_resource type="Script" path="res://Scripts/Stack.gd" id="6_uelyn"]
+[ext_resource type="Script" path="res://Scripts/Ghosts.gd" id="9_3dj6c"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_85i4i"]
 size = Vector2(34, 37)
@@ -141,7 +142,7 @@ _data = {
 script = ExtResource("1_q42w7")
 
 [node name="bg" type="Sprite2D" parent="."]
-modulate = Color(1, 1, 1, 0.396078)
+modulate = Color(0, 0, 0, 0.396078)
 position = Vector2(120, 80)
 scale = Vector2(4.02354, 3.05743)
 texture = ExtResource("3_f7x1n")
@@ -231,3 +232,15 @@ offset_right = 120.0
 offset_bottom = 63.0
 text = "jjjjj"
 script = ExtResource("6_fqcno")
+
+[node name="Ghosts" type="Node2D" parent="."]
+position = Vector2(120, 80)
+script = ExtResource("9_3dj6c")
+
+[node name="ProtoGhost" type="Sprite2D" parent="Ghosts"]
+self_modulate = Color(1, 1, 1, 0.309804)
+position = Vector2(-100, -60)
+texture = ExtResource("6_bg8mk")
+centered = false
+hframes = 8
+frame = 5
