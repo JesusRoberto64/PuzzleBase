@@ -89,7 +89,7 @@ func _process(delta):
 	cycle += delta*velCycle
 	if cycle >= limitCycle:
 		cycle = 0
-		#countCycle += 1
+		countCycle += 1 #This control the create bloc cycle
 		if canCast:
 			canCast = false
 			create_Bloc_Color(castPos,castColor)
@@ -111,7 +111,7 @@ func top_Free():
 func create_Bloc(_pos: Vector2):
 	var newBloc = Proto.instantiate()
 	var _debugArr = [0,4,4,4,4,3,3,3]
-	var color = _debugArr[debug_Blocs % _debugArr.size()] #randi() % blocColors #_debugArr[debug_Blocs % debugArr.size()]
+	var color = randi() % blocColors#randi() % blocColors #_debugArr[debug_Blocs % debugArr.size()]
 	debug_Blocs += 1
 	newBloc.set_Color(Vector2(color,0))#get_child(0).frame_coords = Vector2(color,0)
 	newBloc.position = _pos
@@ -120,8 +120,7 @@ func create_Bloc(_pos: Vector2):
 
 func create_Bloc_Color(_pos: Vector2, _color):
 	var newBloc = Proto.instantiate()
-	var color = _color
-	newBloc.set_Color(Vector2(color,0))
+	newBloc.set_Color(Vector2(_color,0))
 	newBloc.position = _pos
 	Blocs.add_child(newBloc)
 	newBloc.casted()
