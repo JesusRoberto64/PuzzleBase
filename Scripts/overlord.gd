@@ -5,7 +5,7 @@ extends Node2D
 var state = 1
 @onready var Proto = preload("res://Entities/Proto_Bloc.tscn")
 
-var colums = 6#6#12
+var colums = 12#6#12
 var rows = 8
 var blocH 
 var blocW
@@ -40,6 +40,9 @@ var Stacks
 #when blocks are falling, becouse the absorb a cast mechanics have bugs
 @onready var ghosts = $Ghosts
 
+#Inti the pictures
+@onready var picto = $PictBloc
+
 func _ready():
 	for x in range(rows): # Remember rows = is the first [r]
 		arrMatch.append([])# Remember colums = is the second[r][c]
@@ -62,9 +65,12 @@ func _ready():
 	
 	if get_tree().get_first_node_in_group("Stack"):
 		Stacks = get_tree().get_nodes_in_group("Stack")
-	
 	#Init Ghosts
 	ghosts._draw_Blocs(arrMatch, Vector2(blocW,blocH))
+	#Init Picto
+	picto._set_Array(arrMatch, Vector2(blocW,blocH))
+	picto.set_Image()
+	
 
 func _process(delta):
 	#print("FPS: ",Engine.get_frames_per_second())
@@ -91,7 +97,6 @@ func _process(delta):
 		gravity()# 1 iteratio
 		check_Matches()# 2 iterations
 		
-
 
 func top_Free():
 	var spaces = []
@@ -204,20 +209,16 @@ func selector_Act(_player, _pos: Vector2):
 			ghosts.hide_Bloc(Vector2(pos.x, pos.y -1))
 			if pos.y < rows-1: #Here to dont cause erros in array size.
 				ghosts.hide_Bloc(Vector2(pos.x, pos.y +1))
-			print("Ghost heres")
 			_player.can_Move()
 			return
 		elif bloc != null and !bloc.IsMatched:
 			stack.add_Bloc(bloc.get_Color())
 			bloc.queue_free()
 			arrMatch[_pos.y/blocH][_pos.x/blocW] = null
-			print("Bloc here")
 			_player.can_Move()
 			return
 	# CAST ============
-	print(stack.blocs)
 	if stack.have_Blocs() and !ghosts.is_Bloc_Falling(pos):
-		print("CAST!!")
 		cast_Bloc(Vector2(_pos.x,_pos.y),stack.cast_Bloc())
 		_player.cast() #ANIM
 	_player.can_Move()
@@ -228,11 +229,9 @@ func cast_Bloc(_pos, _color):
 		if i.position.x == _pos.x:
 			if i.position.y > _pos.y - blocH and i.position.y < _pos.y + blocH:
 				return
-		pass
 	canCast = true
 	castPos = _pos
 	castColor = _color
-	pass
 
 func check_Matches():
 	var matches = []
@@ -278,6 +277,8 @@ func clear_Matches(matches):
 		for pos in mat:
 			if arrMatch[pos.x][pos.y] != null:
 				arrMatch[pos.x][pos.y].matched()
+				#get the picto
+				picto.break_Pict(Vector2(pos.y, pos.x))
 
 func destroy_Blocs():
 	for c in range(colums):
