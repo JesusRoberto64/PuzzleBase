@@ -19,14 +19,26 @@ var isDirPress = false
 var stackBlocs := [] 
 
 func _process(delta):
-	var Horhold = max(0, Input.get_action_strength("ui_right") + Input.get_action_strength("ui_left"))
-	if Horhold == 1:
+	#Input SLIDE logic
+	if state != STATE.MOVE: return
+	var Horhold = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
+	var VerHold = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
+	#print(VerHold)
+	
+	if Horhold != 0 or VerHold != 0: 
 		slideTimer += delta
 	else:
-		isDirPress = false
 		slideTimer = 0.0
-	
-	
+	if slideTimer >= 0.25: 
+		position.x += blocSize.x*Horhold 
+		position.y += blocSize.y*VerHold
+		position.x = clamp(position.x,0,arenaSize.x*blocSize.x)
+		position.y = clamp(position.y,0,arenaSize.y*blocSize.y)
+		area.position = offset
+		castSpr.position = offset
+	pass
+
+func slide(dir):
 	
 	pass
 
