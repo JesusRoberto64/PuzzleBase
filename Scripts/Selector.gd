@@ -7,14 +7,28 @@ var blocSize :Vector2 = Vector2(1,1)
 var arenaSize: Vector2 = Vector2(10,10)
 
 signal action(player,Pos)
+var slideTimer = 0.0
+var isDirPress = false
+@onready var timer = $Timer
 
 @export var playerID = 1
 @onready var area = $Area2D
 @onready var castSpr = $cast
 @onready var anim = $anim
 
-
 var stackBlocs := [] 
+
+func _process(delta):
+	var Horhold = max(0, Input.get_action_strength("ui_right") + Input.get_action_strength("ui_left"))
+	if Horhold == 1:
+		slideTimer += delta
+	else:
+		isDirPress = false
+		slideTimer = 0.0
+	
+	
+	
+	pass
 
 func set_Up_Blocs(_size:Vector2, _arena:Vector2,_overlord):
 	blocSize = _size

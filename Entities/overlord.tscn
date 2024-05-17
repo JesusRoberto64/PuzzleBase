@@ -193,6 +193,8 @@ libraries = {
 "": SubResource("AnimationLibrary_e1grh")
 }
 
+[node name="Timer" type="Timer" parent="Selector"]
+
 [node name="Stack" type="Node2D" parent="." groups=["Stack"]]
 position = Vector2(680, 440)
 script = ExtResource("6_uelyn")
