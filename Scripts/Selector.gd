@@ -21,16 +21,15 @@ var stackBlocs := []
 func _process(delta):
 	#Input SLIDE logic
 	if state != STATE.MOVE: return
-	var Horhold = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
+	var horHold = Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left")
 	var VerHold = Input.get_action_strength("ui_down") - Input.get_action_strength("ui_up")
-	#print(VerHold)
 	
-	if Horhold != 0 or VerHold != 0: 
+	if horHold != 0 or VerHold != 0: 
 		slideTimer += delta
 	else:
 		slideTimer = 0.0
 	if slideTimer >= 0.25: 
-		position.x += blocSize.x*Horhold 
+		position.x += blocSize.x*horHold 
 		position.y += blocSize.y*VerHold
 		position.x = clamp(position.x,0,arenaSize.x*blocSize.x)
 		position.y = clamp(position.y,0,arenaSize.y*blocSize.y)
@@ -38,13 +37,9 @@ func _process(delta):
 		castSpr.position = offset
 	pass
 
-func slide(dir):
-	
-	pass
-
 func set_Up_Blocs(_size:Vector2, _arena:Vector2,_overlord):
 	blocSize = _size
-	arenaSize.x = _arena.x-1 #due to dont have offset
+	arenaSize.x = _arena.x-1 #due to dont have out border value.
 	arenaSize.y = _arena.y-1
 	action.connect(_overlord.selector_Act)
 	pass

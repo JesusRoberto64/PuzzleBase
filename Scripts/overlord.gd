@@ -2,7 +2,9 @@ extends Node2D
 # Es que el fondo se pinte cuando haces match, completas la imagen y ganas
 # La cubeta es compartida (stack)
 # Hacer el player 2-3-4
-var state = 1
+enum STATE {GAME, LOSE, PAUSE}
+
+var state = STATE.GAME
 @onready var Proto = preload("res://Entities/Proto_Bloc.tscn")
 
 var colums = 12#6#12
@@ -60,7 +62,7 @@ func _ready():
 		if blocH % i == 0:
 			velocities.append(i)
 	velGrav = velocities[4]
-	
+	#Player ready for action
 	selector_Set(Selector)
 	
 	if get_tree().get_first_node_in_group("Stack"):
@@ -71,10 +73,13 @@ func _ready():
 	picto._set_Array(arrMatch, Vector2(blocW,blocH))
 	picto.set_Image()
 	
+	#Create the firsts blocs
+	create_Initial_Blocs()
+	
 
 func _process(delta):
 	#print("FPS: ",Engine.get_frames_per_second())
-	if state != 1 : return
+	if state != STATE.GAME : return
 	#The cycles to create blocks from upper part
 	if countCycle >= createCycle*multCycle or Input.is_action_just_released("trow"):
 		countCycle = 0
@@ -82,7 +87,7 @@ func _process(delta):
 		var freeSpace = top_Free()
 		if freeSpace == null:
 			print("=========you lose======")
-			state = 0
+			state = STATE.LOSE
 		else:
 			create_Bloc(Vector2(blocW*freeSpace,-blocH))
 	#Normal Cycle
@@ -111,7 +116,7 @@ func top_Free():
 func create_Bloc(_pos: Vector2):
 	var newBloc = Proto.instantiate()
 	var _debugArr = [0,4,4,4,4,3,3,3]
-	var color = randi() % blocColors#randi() % blocColors #_debugArr[debug_Blocs % debugArr.size()]
+	var color = randi() % blocColors#randi() % blocColors #_debugArr[debug_Blocs % _debugArr.size()]
 	debug_Blocs += 1
 	newBloc.set_Color(Vector2(color,0))#get_child(0).frame_coords = Vector2(color,0)
 	newBloc.position = _pos
@@ -124,7 +129,14 @@ func create_Bloc_Color(_pos: Vector2, _color):
 	newBloc.position = _pos
 	Blocs.add_child(newBloc)
 	newBloc.casted()
-	pass
+
+func create_Initial_Blocs():
+	var rowsHeight = 3
+	for c in range(colums):
+		#from the maximun rows -1 to have the start then goes to 3 rows because
+		# the second number is exlcuded. In other words: (how many rows height)+1? 
+		for r in range(rows-1,rowsHeight+1,-1): #Check dcumentation range
+			create_Bloc(Vector2(c*blocW, r*blocH))
 
 func gravity():
 	for i in Blocs.get_children():
@@ -193,7 +205,7 @@ func selector_Set(_selector):#For the two players
 	_selector.set_Up_Blocs(Vector2(blocW,blocH),Vector2(colums,rows),self)
 
 func selector_Act(_player, _pos: Vector2):
-	if state != 1 : return
+	if state != STATE.GAME : return
 	var bloc = arrMatch[_pos.y/blocH][_pos.x/blocW]
 	var stack = Stacks[_player.playerID-1]
 	#To cnvert in array form and easy to manipulate to the ghost fuctions
@@ -217,7 +229,7 @@ func selector_Act(_player, _pos: Vector2):
 			_player.can_Move()
 			return
 	# CAST ============
-	if stack.have_Blocs() and !ghosts.is_Bloc_Falling(pos):
+	if stack.have_Blocs() and !ghosts.is_Bloc_Falling(pos) and bloc == null:
 		cast_Bloc(Vector2(_pos.x,_pos.y),stack.cast_Bloc())
 		_player.cast() #ANIM
 	_player.can_Move()
@@ -288,9 +300,13 @@ func destroy_Blocs():
 				arrMatch[r][c] = null
 
 func _input(event):
+	if Input.is_key_pressed(KEY_5):
+		get_tree().reload_current_scene()
+		pass
+	
 	if event.is_action_pressed("ui_accept"):
-		if state == 0:
-			state = 1
+		if state == STATE.PAUSE:
+			state = STATE.GAME
 			return
 		print("============================")
 		for x in arrMatch:
@@ -301,4 +317,4 @@ func _input(event):
 				else:
 					Currarray.append("Null")
 			print(Currarray)
-		state = 0
+		state = STATE.PAUSE
